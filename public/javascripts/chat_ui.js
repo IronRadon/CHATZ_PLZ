@@ -14,8 +14,9 @@
 
   ChatUI.prototype.addToDisplay = function() {
     this.socket.on('message', function(data) {
-      $('#messages').append('<br>');
-      $('#messages').append(data);
+      $('#messages').append('<br>'); //does not know chatServer
+      $('#messages').append('<b>' + data.name + ': </b>');
+      $('#messages').append(''+ data.message);
     })
   };
 
@@ -25,7 +26,17 @@ $(function(){
   var chat = new ChatApp.ChatUI();
 
   $('#submit').click(function(event) {
-    chat.sendMessage($('#to-send').val());
-    $('#to-send').val("");
+    var message = $('#to-send').val();
+
+    if(message.slice(0, 5) === "/nick") {
+      chat.socket.emit("nicknameChangeRequest", message.slice(6))
+    } else {
+      chat.sendMessage(message);
+      $('#to-send').val("");
+    }
   });
+
+  chat.socket.on("nicknameChangeResult")
+
+
 })
